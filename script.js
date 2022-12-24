@@ -15298,12 +15298,19 @@ const DANCE_ANIMATION_DURATION = 500
 const keyboard = document.querySelector("[data-keyboard]")
 const alertContainer = document.querySelector("[data-alert-container]")
 const guessGrid = document.querySelector("[data-guess-grid]")
+const rightLetterGrid = document.querySelector("[data-right-letter-grid]")
+const rightPlaceGrid = document.querySelector("[data-right-place-grid]")
 
 // gets target word
 const offsetFromDate = new Date(2022, 0, 1)
 const msOffset = Date.now() - offsetFromDate
 const dayOffset = msOffset / 1000 / 60 / 60 / 24
 const targetWord = targetWords[Math.floor(dayOffset)]
+
+// Cinque variables
+var rightLetter = 0
+var rightPlace = 0
+var guessIndex = 0
 
 /* USER INTERACTION */
 startInteraction()
@@ -15403,7 +15410,7 @@ function deleteKey() {
 
 // function for submitting guess
 function submitGuess() {
-    // gets active tiles and return them into an array
+    // gets active tiles and turns them into an array
     const activeTiles = [...getActiveTiles()]
 
     // if active tiles are not the right word length shows message
@@ -15454,11 +15461,14 @@ function flipTile(tile, index, array, guess) {
             if (targetWord[index] === letter) {
                 tile.dataset.state = "correct"  // sets tile to green
                 key.classList.add("correct") // sets keyboard to green
+                rightLetter = rightLetter + 1;
+                rightPlace = rightPlace + 1;
             }
             // if the letter is in the word but in the wrong location
             else if (targetWord.includes(letter)) {
                 tile.dataset.state = "wrong-location" // sets tile to yellow
                 key.classList.add("wrong-location") // sets keyboard to yellow
+                rightLetter = rightLetter + 1;
             }
             // if the letter is not in the word
             else {
@@ -15472,6 +15482,13 @@ function flipTile(tile, index, array, guess) {
                     "transitionend",
                     () => {
                         startInteraction()  // start interaction
+                        console.log("Right Place", rightPlace)
+                        console.log("Right Letter", rightLetter)
+                        setRightLetter(rightLetter)
+                        setRightPlace(rightPlace)
+                        rightLetter = 0
+                        rightPlace = 0
+                        guessIndex = guessIndex + 1;
                         checkWinLose(guess, array) // check if win or lose
                     },
                     { once: true }
@@ -15480,6 +15497,16 @@ function flipTile(tile, index, array, guess) {
         },
         { once: true }
     )
+}
+
+function setRightLetter(lettersRight) {
+    const nextLetter = rightLetterGrid.getElementsByTagName("div")[guessIndex]
+    nextLetter.textContent = lettersRight
+}
+
+function setRightPlace(placesRight) {
+    const nextPlace = rightPlaceGrid.getElementsByTagName("div")[guessIndex]
+    nextPlace.textContent = placesRight
 }
 
 // function returns the number of active tiles (used so that no more than 5 are active)
