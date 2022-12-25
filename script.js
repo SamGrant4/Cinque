@@ -15311,6 +15311,9 @@ const targetWord = targetWords[Math.floor(dayOffset)]
 var rightLetter = 0
 var rightPlace = 0
 var guessIndex = 0
+let duplicateArray = []
+var dp = 0
+let checkWordle = 0
 
 /* USER INTERACTION */
 startInteraction()
@@ -15435,6 +15438,9 @@ function submitGuess() {
     // stops any interactions after a guess
     stopInteraction()
 
+    checkWordle = targetWord
+
+    // flipTile(activeTiles, guess)
     // flip tile animation
     activeTiles.forEach((...params) => flipTile(...params, guess))
 }
@@ -15442,6 +15448,16 @@ function submitGuess() {
 function flipTile(tile, index, array, guess) {
     // gets the letter of the tile
     const letter = tile.dataset.letter
+
+    // makes array of letters in guess
+    if (dp == 0) {
+        for (i = 0; i <= 4; i++) {
+            duplicateArray.push(array[i].dataset.letter)
+            dp += 1
+        }
+    }
+
+    var duplicateLetter = checkForDuplicates(letter)
 
     // gets the key from the keyboard that matches the letter
     const key = keyboard.querySelector(`[data-key="${letter}"i]`)
@@ -15463,12 +15479,19 @@ function flipTile(tile, index, array, guess) {
                 key.classList.add("correct") // sets keyboard to green
                 rightLetter = rightLetter + 1;
                 rightPlace = rightPlace + 1;
+                checkWordle = checkWordle.replace(letter, '')
             }
             // if the letter is in the word but in the wrong location
-            else if (targetWord.includes(letter)) {
-                tile.dataset.state = "wrong-location" // sets tile to yellow
-                key.classList.add("wrong-location") // sets keyboard to yellow
-                rightLetter = rightLetter + 1;
+            else if (checkWordle.includes(letter)) {
+                if (duplicateLetter == false) {
+                    tile.dataset.state = "wrong-location" // sets tile to yellow
+                    key.classList.add("wrong-location") // sets keyboard to yellow
+                    rightLetter = rightLetter + 1;
+                    checkWordle = checkWordle.replace(letter, '')
+                }
+                else {
+                    tile.dataset.state = "wrong" // add wrong class
+                }
             }
             // if the letter is not in the word
             else {
@@ -15482,8 +15505,7 @@ function flipTile(tile, index, array, guess) {
                     "transitionend",
                     () => {
                         startInteraction()  // start interaction
-                        console.log("Right Place", rightPlace)
-                        console.log("Right Letter", rightLetter)
+                        // Right Letter and Place Columns
                         setRightLetter(rightLetter)
                         setRightPlace(rightPlace)
                         rightLetter = 0
@@ -15498,6 +15520,133 @@ function flipTile(tile, index, array, guess) {
         { once: true }
     )
 }
+
+function checkForDuplicates(letter) {
+    var duplicate = false
+    const index = duplicateArray.indexOf(letter);
+    if (index > -1) {
+        duplicateArray.splice(index, 1);
+    }
+    if (duplicateArray.includes(letter)) {
+        duplicate = true
+    }
+
+    return duplicate
+}
+// function flipTile(tile, index, array, guess) {
+//     // gets the letter of the tile
+//     const letter = tile.dataset.letter
+
+//     // // makes array of letters in guess
+//     // if (dp == 0) {
+//     //     for (i = 0; i <= 4; i++) {
+//     //         duplicateArray.push(array[i].dataset.letter)
+//     //         dp += 1
+//     //     }
+//     // }
+
+//     // var duplicateLetter = checkForDuplicates(letter)
+
+//     // gets the key from the keyboard that matches the letter
+//     const key = keyboard.querySelector(`[data-key="${letter}"i]`)
+
+//     // adds flip animation
+//     setTimeout(() => {
+//         tile.classList.add("flip")
+//     }, (index * FLIP_ANIMATION_DURATION) / 2)
+
+//     tile.addEventListener(
+//         "transitionend",
+//         () => {
+//             // removes flip animation
+//             tile.classList.remove("flip")
+
+//             // if the letter of the guess is correct
+//             if (targetWord[index] === letter) {
+//                 tile.dataset.state = "correct"  // sets tile to green
+//                 key.classList.add("correct") // sets keyboard to green
+//                 rightLetter = rightLetter + 1;
+//                 rightPlace = rightPlace + 1;
+//                 checkWordle = checkWordle.replace(letter, '')
+//                 console.log(checkWordle)
+//             }
+//             // if the letter is in the word but in the wrong location
+//             else if (checkWordle.includes(letter)) {
+//                 // if (duplicateLetter == false) {
+//                 //     tile.dataset.state = "wrong-location" // sets tile to yellow
+//                 //     key.classList.add("wrong-location") // sets keyboard to yellow
+//                 //     rightLetter = rightLetter + 1;
+//                 // }
+//                 // else {
+//                 //     tile.dataset.state = "wrong" // add wrong class
+//                 // }
+//                 tile.dataset.state = "wrong-location" // sets tile to yellow
+//                 key.classList.add("wrong-location") // sets keyboard to yellow
+//                 rightLetter = rightLetter + 1;
+//                 checkWordle = checkWordle.replace(letter, '')
+//             }
+//             // if the letter is not in the word
+//             else {
+//                 tile.dataset.state = "wrong" // add wrong class
+//                 key.classList.add("wrong") // add wrong class
+//             }
+
+//             // if last tile has finished start interaction again
+//             if (index === array.length - 1) {
+//                 tile.addEventListener(
+//                     "transitionend",
+//                     () => {
+//                         startInteraction()  // start interaction
+//                         // Right Letter and Place Columns
+//                         setRightLetter(rightLetter)
+//                         setRightPlace(rightPlace)
+//                         rightLetter = 0
+//                         rightPlace = 0
+//                         guessIndex = guessIndex + 1;
+//                         checkWinLose(guess, array) // check if win or lose
+//                     },
+//                     { once: true }
+//                 )
+//             }
+//         },
+//         { once: true }
+//     )
+// }
+
+// function flipTile(activeTiles, guess) {
+
+//     const guessArray = []
+
+//     activeTiles.forEach(tile => {
+//         const letter = tile.dataset.letter
+//         guessArray.push(letter)
+//         var key = keyboard.querySelector(`[data-key="${letter}"i]`)
+
+//         tile.dataset.state = "wrong" // add wrong class
+//         key.classList.add("wrong") // add wrong class
+//     })
+
+//     guessArray.forEach((guess, index) => {
+//         console.log(activeTiles[index])
+//         if (guess == targetWord[index]) {
+//             var key = keyboard.querySelector(`[data-key="${guess}"i]`)
+//             activeTiles[index].dataset.state = "correct"  // sets tile to green
+//             key.classList.add("correct") // sets keyboard to green
+//             checkWordle = checkWordle.replace(guess.letter, '')
+//         }
+//     })
+
+//     guessArray.forEach((guess, index) => {
+//         if ((checkWordle.includes(guess)) && (activeTiles[index].dataset.state != "correct")) {
+//             var key = keyboard.querySelector(`[data-key="${guess}"i]`)
+//             activeTiles[index].dataset.state = "wrong-location" // sets tile to yellow
+//             guess.color = 'yellow'
+//             key.classList.add("wrong-location")
+//             checkWordle = checkWordle.replace(guess.letter, '')
+//         }
+//     })
+
+// }
 
 function setRightLetter(lettersRight) {
     const nextLetter = rightLetterGrid.getElementsByTagName("div")[guessIndex]
