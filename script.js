@@ -15440,7 +15440,6 @@ function submitGuess() {
 
     checkWordle = targetWord
 
-    // flipTile(activeTiles, guess)
     // flip tile animation
     activeTiles.forEach((...params) => flipTile(...params, guess))
 }
@@ -15519,6 +15518,7 @@ function flipTile(tile, index, array, guess) {
                         }
                         rightLetter = 0
                         rightPlace = 0
+                        dp = 0
                         guessIndex = guessIndex + 1;
                         checkWinLose(guess, array) // check if win or lose
                     },
