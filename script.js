@@ -15480,7 +15480,6 @@ function flipTile(tile, index, array, guess) {
                 rightLetter = rightLetter + 1;
                 rightPlace = rightPlace + 1;
                 checkWordle = checkWordle.replace(letter, '')
-                console.log(tile.dataset)
                 if ((guess[0] == targetWord[0]) && (guess[1] == targetWord[1]) && (guess[2] == targetWord[2]) && (guess[3] == targetWord[3]) && (guess[4] == targetWord[4])) {
                     tile.dataset.state = "win"
                 }
@@ -15500,10 +15499,10 @@ function flipTile(tile, index, array, guess) {
             // if the letter is not in the word
             else {
                 tile.dataset.state = "wrong" // add wrong class
-
-                if ((guess[0] != targetWord[0]) && (guess[1] != targetWord[1]) && (guess[2] != targetWord[2]) && (guess[3] != targetWord[3]) && (guess[4] != targetWord[4])) {
-                    key.classList.add("wrong") // add wrong class
-                }
+                // console.log(targetWord.indexOf(guess[index]) > -1)
+                // if ((!targetWord.indexOf(guess[0]) < -1) && (!targetWord.indexOf(guess[1]) < -1) && (!targetWord.indexOf(guess[2]) < -1) && (!targetWord.indexOf(guess[3]) < -1) && (!targetWord.indexOf(guess[4]) < -1)) {
+                //     key.classList.add("wrong") // add wrong class
+                // }
             }
 
             // if last tile has finished start interaction again
@@ -15515,6 +15514,9 @@ function flipTile(tile, index, array, guess) {
                         // Right Letter and Place Columns
                         setRightLetter(rightLetter)
                         setRightPlace(rightPlace)
+                        if ((rightLetter == 0) && (rightPlace == 0)) {
+                            addWrongKey(array)
+                        }
                         rightLetter = 0
                         rightPlace = 0
                         guessIndex = guessIndex + 1;
@@ -15527,6 +15529,14 @@ function flipTile(tile, index, array, guess) {
         { once: true }
     )
 }
+
+function addWrongKey(array) {
+    for (i = 0; i <= 4; i++) {
+        var key = keyboard.querySelector(`[data-key="${array[i].dataset.letter}"i]`)
+        key.classList.add("wrong") // add wrong class   
+    }
+}
+
 
 function checkForDuplicates(letter) {
     var duplicate = false
